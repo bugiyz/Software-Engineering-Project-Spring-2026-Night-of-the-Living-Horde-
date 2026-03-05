@@ -10,7 +10,7 @@ public class ZombieAI : MonoBehaviour
     public float loseRadius = 8f;
     public bool requireLineOfSight = false;
     public LayerMask playerLayer;
-    public LayerMask obstacleLayer; // set to Walls layer later
+    public LayerMask obstacleLayer;
 
     [Header("Chase")]
     public float chaseSpeed = 2.5f;
@@ -19,11 +19,39 @@ public class ZombieAI : MonoBehaviour
     public float roamSpeed = 1.4f;
     public float roamDirectionChangeMin = 1.0f;
     public float roamDirectionChangeMax = 2.5f;
-    public float roamTurnSharpness = 8f; // higher = more responsive
-    public float avoidDistance = 0.8f;   // how far ahead to check walls
+    public float roamTurnSharpness = 8f;
+    public float avoidDistance = 0.8f;
 
     [Header("Memory")]
     public float memorySeconds = 1.5f;
+
+    [Header("Animator")]
+    public string moveXParam = "MoveX";
+    public string moveYParam = "MoveY";
+    public float animDampTime = 0.08f;
+
+    [Header("Attack")]
+    public float attackRange = 1.3f;
+    public float attackCooldown = 1.0f;     // time between hits
+    public float attackWindup = 0.10f;      // small delay before hit (optional)
+    public string isAttackingParam = "IsAttacking";
+    [Header("Attack Hit")]
+    public Transform attackPoint;
+    public float hitRadius = 0.28f;
+    public LayerMask playerHitLayer;   // set to Player layer
+    public int attackDamage = 10;
+
+    [Header("Run Burst")]
+    public float runBurstMultiplier = 1.6f;   // 1.3–2.0 feels good
+    public float runBurstSeconds = 0.8f;      // 0.4–1.2
+    float runBurstEndTime;
+
+    [Header("Run Visual")]
+    public float normalAnimSpeed = 1.0f;
+    public float runAnimSpeed = 1.35f;
+
+    float nextAttackTime;
+    Vector2 lastMoveDir = Vector2.down;     // remembers last facing direction
 
     Rigidbody2D rb;
     Transform player;
@@ -33,9 +61,14 @@ public class ZombieAI : MonoBehaviour
     Vector2 roamDir;
     float nextRoamChangeTime;
 
+    Animator anim;
+    SpriteRenderer sr;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponentInChildren<Animator>();
+        sr = GetComponentInChildren<SpriteRenderer>();
     }
 
     void Start()
@@ -44,25 +77,61 @@ public class ZombieAI : MonoBehaviour
     }
 
     void FixedUpdate()
-    {
-        // --- Detection / state update ---
-        AcquireOrUpdateTarget();
+{
+    AcquireOrUpdateTarget();
 
-        // --- Movement ---
-        if (chasing && player != null)
+    // If we have a player, check if we should attack
+    if (player != null)
+    {
+        float dist = Vector2.Distance(rb.position, (Vector2)player.position);
+
+        if (dist <= attackRange)
         {
-            Vector2 dir = ((Vector2)player.position - rb.position).normalized;
-            rb.velocity = dir * chaseSpeed;
+            TryAttack();
+            // During attack, we stop movement
+            rb.velocity = Vector2.zero;
+
+            // Feed animator using last facing direction works with attack blend to stay in correct direction
+            UpdateAnimatorFacing(lastMoveDir);
+            return;
         }
         else
         {
-            Roam();
+            // Not in range -> ensure we are not in attack state for animation
+            if (anim) anim.SetBool(isAttackingParam, false);
         }
     }
 
+    // Normal movement
+    if (chasing && player != null)
+{
+    Vector2 dir = ((Vector2)player.position - rb.position).normalized;
+
+    float speed = chaseSpeed;
+    if (Time.time < runBurstEndTime)
+        speed *= runBurstMultiplier;
+
+    rb.velocity = dir * speed;
+
+    // adjust animation speed when running
+    if (anim)
+        anim.speed = (Time.time < runBurstEndTime) ? runAnimSpeed : normalAnimSpeed;
+    }
+    else
+    {
+    Roam();
+    }
+
+    // Save last direction whenever we are moving (for attack facing)
+    if (rb.velocity.sqrMagnitude > 0.0001f)
+        lastMoveDir = rb.velocity.normalized;
+
+    UpdateAnimator(rb.velocity);
+}
+
     void AcquireOrUpdateTarget()
     {
-        // If we don't have a player reference yet, try to acquire when close
+        runBurstEndTime = Time.time + runBurstSeconds;
         if (player == null)
         {
             Collider2D hit = Physics2D.OverlapCircle(transform.position, detectionRadius, playerLayer);
@@ -74,28 +143,25 @@ public class ZombieAI : MonoBehaviour
             player = hit.transform;
             chasing = true;
             lastTimePlayerSeen = Time.time;
+            runBurstEndTime = Time.time + runBurstSeconds;
             return;
         }
 
         float dist = Vector2.Distance(transform.position, player.position);
 
-        // Refresh "seen" time if LOS is allowed OR LOS is clear
         if (!requireLineOfSight || HasLineOfSight(player))
-        {
             lastTimePlayerSeen = Time.time;
-        }
 
-        // If not chasing, start chasing once inside detection radius
         if (!chasing && dist <= detectionRadius)
         {
             if (!requireLineOfSight || HasLineOfSight(player))
             {
                 chasing = true;
                 lastTimePlayerSeen = Time.time;
+                runBurstEndTime = Time.time + runBurstSeconds;
             }
         }
 
-        // Stop chasing when far + memory expired
         bool tooFar = dist > loseRadius;
         bool memoryExpired = (Time.time - lastTimePlayerSeen) > memorySeconds;
 
@@ -103,20 +169,19 @@ public class ZombieAI : MonoBehaviour
         {
             chasing = false;
             player = null;
-            PickNewRoamDirection(); // immediately resume wandering
+            PickNewRoamDirection();
         }
     }
 
     void Roam()
     {
-        // Change direction occasionally
+        if (anim)
+            anim.speed = normalAnimSpeed;
+
         if (Time.time >= nextRoamChangeTime)
             PickNewRoamDirection();
 
-        // Wall avoidance: if something is in front, steer away
         Vector2 adjusted = AvoidWalls(roamDir);
-
-        // Smooth turning so it doesn't snap
         roamDir = Vector2.Lerp(roamDir, adjusted, roamTurnSharpness * Time.fixedDeltaTime).normalized;
 
         rb.velocity = roamDir * roamSpeed;
@@ -131,16 +196,12 @@ public class ZombieAI : MonoBehaviour
 
     Vector2 AvoidWalls(Vector2 desiredDir)
     {
-        // If no obstacle layer is set or not using obstacles yet, just roam normally
         if (obstacleLayer.value == 0) return desiredDir;
 
         Vector2 origin = rb.position;
-
-        // Raycast forward to see if we're about to hit a wall
         RaycastHit2D hit = Physics2D.Raycast(origin, desiredDir, avoidDistance, obstacleLayer);
         if (hit.collider == null) return desiredDir;
 
-        // If blocked, try turning left or right (pick whichever is clearer)
         Vector2 left = new Vector2(-desiredDir.y, desiredDir.x);
         Vector2 right = new Vector2(desiredDir.y, -desiredDir.x);
 
@@ -150,7 +211,6 @@ public class ZombieAI : MonoBehaviour
         if (leftClear && !rightClear) return left;
         if (rightClear && !leftClear) return right;
 
-        // If both blocked or both clear, just pick one randomly
         return (Random.value < 0.5f) ? left : right;
     }
 
@@ -166,6 +226,65 @@ public class ZombieAI : MonoBehaviour
         return hit.collider == null;
     }
 
+    void UpdateAnimator(Vector2 velocity)
+    {
+        if (!anim) return;
+
+        float speed = velocity.magnitude;
+
+        // Don't spam direction changes if basically stopped
+        if (speed < 0.01f)
+            return;
+
+        Vector2 dir = velocity / speed;
+
+        // Drive the blend tree
+        anim.SetFloat(moveXParam, dir.x, animDampTime, Time.fixedDeltaTime);
+        anim.SetFloat(moveYParam, dir.y, animDampTime, Time.fixedDeltaTime);
+
+    }
+
+    void TryAttack()
+    {
+    if (!anim) return;
+
+    // If we're in cooldown, stay in attack anim but don't "hit" again yet
+    anim.SetBool(isAttackingParam, true);
+
+    if (Time.time < nextAttackTime)
+        return;
+
+    nextAttackTime = Time.time + attackCooldown;
+
+    DealDamage();
+    }
+
+void DealDamage()
+{
+    if (!attackPoint) return;
+
+    Vector2 offset = lastMoveDir.normalized * 0.35f; // adjust distance
+    attackPoint.localPosition = offset;
+
+    Collider2D hit = Physics2D.OverlapCircle(attackPoint.position, hitRadius, playerHitLayer);
+    if (hit == null) return;
+
+    var health = hit.GetComponent<PlayerHealth>();
+    if (health != null)
+        health.TakeDamage(attackDamage);
+}
+
+    void UpdateAnimatorFacing(Vector2 dir)
+{
+    if (!anim) return;
+
+    // If dir is tiny, do nothing
+    if (dir.sqrMagnitude < 0.0001f) return;
+
+    anim.SetFloat(moveXParam, dir.x, animDampTime, Time.fixedDeltaTime);
+    anim.SetFloat(moveYParam, dir.y, animDampTime, Time.fixedDeltaTime);
+}
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
@@ -173,5 +292,11 @@ public class ZombieAI : MonoBehaviour
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, loseRadius);
+
+        if (attackPoint)
+        {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(attackPoint.position, hitRadius);
+        }
     }
 }
