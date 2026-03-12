@@ -1886,7 +1886,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e0ca485206e0ca42b22170ea3cb454d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 8
+  speed: 4
+  runSpeed: 8
+  dashSpeed: 20
+  dashTime: 0.15
+  maxStamina: 100
+  stamina: 0
+  runStaminaDrain: 20
+  dashCost: 30
+  staminaRegen: 15
+  exhaustedRecoveryDelay: 3
 --- !u!4 &2020054288
 Transform:
   m_ObjectHideFlags: 0

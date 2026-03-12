@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|c:\\users\\oswad\\onedrive\\documents\\github\\new folder\\software-engineering-project-spring-2026\\assets\\scripts\\playermove.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playermove.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|c:\\users\\oswad\\onedrive\\documents\\github\\new folder\\software-engineering-project-spring-2026\\assets\\scripts\\camerafollow2d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\camerafollow2d.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|c:\\users\\oswad\\onedrive\\documents\\github\\new folder\\software-engineering-project-spring-2026\\assets\\scripts\\bullet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\bullet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "CameraFollow2D.cs",
+              "DocumentMoniker": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\CameraFollow2D.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\CameraFollow2D.cs",
+              "ToolTip": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\CameraFollow2D.cs",
+              "RelativeToolTip": "Assets\\Scripts\\CameraFollow2D.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T03:56:08.606Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Bullet.cs",
+              "DocumentMoniker": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\Bullet.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Bullet.cs",
+              "ToolTip": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\Bullet.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Bullet.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T03:56:07.636Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PlayerMove.cs",
+              "DocumentMoniker": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\PlayerMove.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerMove.cs",
+              "ToolTip": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\PlayerMove.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PlayerMove.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-12T03:55:24.177Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
