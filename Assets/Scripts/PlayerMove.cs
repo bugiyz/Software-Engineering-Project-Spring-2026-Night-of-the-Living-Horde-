@@ -1,27 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMove : MonoBehaviour
 {
     public float speed = 5f;
     public float runSpeed = 8f;
 
-    public float dashSpeed = 20f;
-    public float dashTime = 0.15f;
+    // UI
+    public Image StaminaBar;
+    public CanvasGroup staminaCanvas;
 
-    // Stamina system
+    // Stamina
     public float maxStamina = 100f;
     public float stamina;
 
-    public float runStaminaDrain = 20f; // per second
+    public float runStaminaDrain = 20f;
     public float dashCost = 30f;
-    public float staminaRegen = 15f; // per second
+    public float staminaRegen = 15f;
 
-    // Exhaustion system
+    // Dash
+    public float dashSpeed = 20f;
+    public float dashTime = 0.15f;
+
+    // Exhaustion
     public float exhaustedRecoveryDelay = 2f;
     private float exhaustedTimer = 0f;
     private bool exhausted = false;
+
+    // UI behavior
+    public float hideDelay = 1f;
+    public float fadeSpeed = 3f;
+    private float hideTimer = 0f;
 
     Rigidbody2D rb;
 
@@ -36,23 +47,21 @@ public class PlayerMove : MonoBehaviour
 
     void Update()
     {
-        // Dash
-        if (Input.GetKeyDown(KeyCode.Space) && !isDashing && stamina > 0 && !exhausted)
+        // DASH
+        if (Input.GetKeyDown(KeyCode.Space) && !isDashing && stamina >= dashCost && !exhausted)
         {
-            // Subtract stamina and clamp
             stamina -= dashCost;
-            stamina = Mathf.Clamp(stamina, 0, maxStamina);
 
-            // If stamina hits 0, trigger exhaustion
-            if (stamina == 0)
+            if (stamina <= 0)
             {
+                stamina = 0;
                 exhausted = true;
                 exhaustedTimer = exhaustedRecoveryDelay;
             }
 
-            // Get dash direction
             float h = Input.GetAxisRaw("Horizontal");
             float v = Input.GetAxisRaw("Vertical");
+
             dashDirection = new Vector2(h, v).normalized;
 
             if (dashDirection == Vector2.zero)
@@ -62,6 +71,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         HandleStaminaRegen();
+        UpdateStaminaUI();
     }
 
     void FixedUpdate()
@@ -78,16 +88,16 @@ public class PlayerMove : MonoBehaviour
         Vector2 move = new Vector2(h, v).normalized;
         float currentSpeed = speed;
 
-        // Running
+        // RUN
         if (Input.GetKey(KeyCode.LeftShift) && stamina > 0 && !exhausted)
         {
             currentSpeed = runSpeed;
-            stamina -= runStaminaDrain * Time.fixedDeltaTime;
-            stamina = Mathf.Clamp(stamina, 0, maxStamina);
 
-            // Trigger exhaustion if stamina hits 0
-            if (stamina == 0)
+            stamina -= runStaminaDrain * Time.fixedDeltaTime;
+
+            if (stamina <= 0)
             {
+                stamina = 0;
                 exhausted = true;
                 exhaustedTimer = exhaustedRecoveryDelay;
             }
@@ -98,21 +108,22 @@ public class PlayerMove : MonoBehaviour
 
     void HandleStaminaRegen()
     {
-        // Exhaustion: wait before regenerating
         if (exhausted)
         {
             exhaustedTimer -= Time.deltaTime;
+
             if (exhaustedTimer <= 0)
                 exhausted = false;
 
             return;
         }
 
-        // Normal regen when not using stamina
         if (!Input.GetKey(KeyCode.LeftShift) && !isDashing && stamina < maxStamina)
         {
             stamina += staminaRegen * Time.deltaTime;
-            stamina = Mathf.Clamp(stamina, 0, maxStamina);
+
+            if (stamina > maxStamina)
+                stamina = maxStamina;
         }
     }
 
@@ -121,5 +132,30 @@ public class PlayerMove : MonoBehaviour
         isDashing = true;
         yield return new WaitForSeconds(dashTime);
         isDashing = false;
+    }
+
+    void UpdateStaminaUI()
+    {
+        if (StaminaBar != null)
+            StaminaBar.fillAmount = stamina / maxStamina;
+
+        if (staminaCanvas == null) return;
+
+        if (stamina < maxStamina)
+        {
+            // Appear instantly when stamina is used
+            staminaCanvas.alpha = 1f;
+            hideTimer = 0f;
+        }
+        else
+        {
+            hideTimer += Time.deltaTime;
+
+            if (hideTimer >= hideDelay)
+            {
+                // Fade out smoothly when full
+                staminaCanvas.alpha = Mathf.Lerp(staminaCanvas.alpha, 0f, fadeSpeed * Time.deltaTime);
+            }
+        }
     }
 }
