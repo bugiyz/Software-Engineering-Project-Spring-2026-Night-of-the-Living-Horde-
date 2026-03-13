@@ -51,6 +51,12 @@ public class ZombieAI : MonoBehaviour
     public float normalAnimSpeed = 1.0f;
     public float runAnimSpeed = 1.35f;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip idleClip;
+    public AudioClip attackClip;
+    
+
     float nextAttackTime;
     Vector2 lastMoveDir = Vector2.down;
 
@@ -75,6 +81,19 @@ public class ZombieAI : MonoBehaviour
     void Start()
     {
         PickNewRoamDirection();
+
+        audioSource = GetComponent<AudioSource>();
+        
+        Debug.Log("Idle clip assigned? " + (idleClip != null));
+        Debug.Log("AudioSource found? " + (audioSource != null));
+
+
+        if (idleClip != null)
+        {
+            audioSource.clip = idleClip;
+            audioSource.loop = true;
+            audioSource.Play();
+        }
     }
 
     void FixedUpdate()
@@ -263,6 +282,9 @@ public class ZombieAI : MonoBehaviour
 
         nextAttackTime = Time.time + attackCooldown;
         DealDamage();
+
+        // Play Attack Sound
+        audioSource.PlayOneShot(attackClip);
     }
 
     void DealDamage()

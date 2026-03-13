@@ -6,6 +6,9 @@ public class PlayerShooter : MonoBehaviour
     public Transform firePoint;      // empty child object
     public float fireCooldown = 0.2f;
 
+    public AudioSource shootSound;
+    public AudioClip shootClip;
+
     float nextFireTime;
 
     void Update()
@@ -25,5 +28,11 @@ public class PlayerShooter : MonoBehaviour
 
         Bullet b = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
         b.Fire(dir);
+
+        //Play shoot sound
+        if (shootSound != null && shootClip != null)
+        {
+            shootSound.PlayOneShot(shootClip);
+        }
     }
 }
