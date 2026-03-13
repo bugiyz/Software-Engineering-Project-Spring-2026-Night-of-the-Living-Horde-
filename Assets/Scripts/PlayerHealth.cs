@@ -54,16 +54,31 @@ public class PlayerHealth : MonoBehaviour
     }
 
     void Die()
-    {
-        Debug.Log("Player Died");
+{
+    Debug.Log("Player Died");
 
-        // disable movement
-        PlayerMove move = GetComponent<PlayerMove>();
-        if (move != null)
-        {
-            move.enabled = false;
-        }
+    // Stop physics movement immediately
+    Rigidbody2D rb = GetComponent<Rigidbody2D>();
+    if (rb != null)
+    {
+        rb.velocity = Vector2.zero;
+        rb.angularVelocity = 0f;
     }
+
+    // Disable movement
+    PlayerMove move = GetComponent<PlayerMove>();
+    if (move != null)
+    {
+        move.enabled = false;
+    }
+
+    // Disable shooting
+    PlayerShooter shooter = GetComponent<PlayerShooter>();
+    if (shooter != null)
+    {
+        shooter.enabled = false;
+    }
+}
 
     public void Heal(int amount)
     {

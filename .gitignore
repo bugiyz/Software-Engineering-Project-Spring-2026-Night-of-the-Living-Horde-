@@ -8,3 +8,5 @@ UserSettings/
 .vscode/
 *.csproj
 *.sln
+
+.DS_Store

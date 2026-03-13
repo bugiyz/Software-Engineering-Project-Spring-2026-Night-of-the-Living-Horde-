@@ -43,6 +43,9 @@ public class PlayerMove : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         stamina = maxStamina;
+        
+        if (staminaCanvas != null)
+            staminaCanvas.alpha = 0f;
     }
 
     void Update()

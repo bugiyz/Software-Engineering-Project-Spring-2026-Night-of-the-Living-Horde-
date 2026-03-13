@@ -1,8 +1,11 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class ZombieHealth : MonoBehaviour
 {
+    public event Action OnZombieDeath;
+    
     [Header("Health")]
     public int maxHealth = 50;
     public int currentHealth;
@@ -38,6 +41,7 @@ public class ZombieHealth : MonoBehaviour
     void Die()
     {
         // Possibly death animation later, for now just destroy zombie
+        OnZombieDeath?.Invoke();
         Destroy(gameObject);
     }
 }
