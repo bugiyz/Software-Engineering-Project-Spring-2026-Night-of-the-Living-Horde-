@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -77,6 +78,15 @@ public class PlayerHealth : MonoBehaviour
     if (shooter != null)
     {
         shooter.enabled = false;
+    }
+
+    // Return to main menu after 3 seconds
+        StartCoroutine(ReturnToMainMenu());
+   
+    System.Collections.IEnumerator ReturnToMainMenu()
+    {
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene("MainMenu");
     }
 }
 
