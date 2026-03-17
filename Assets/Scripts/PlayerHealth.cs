@@ -1,6 +1,7 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
+using System.Collections;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class PlayerHealth : MonoBehaviour
     private int currentHealth;
 
     [Header("UI")]
-    public Image healthBarFill;
+    public TextMeshProUGUI healthText;
 
     [Header("Invincibility")]
     public float invincibleTime = 1f;
@@ -17,16 +18,11 @@ public class PlayerHealth : MonoBehaviour
     void Start()
     {
         currentHealth = maxHealth;
-
-        if (healthBarFill != null)
-        {
-            healthBarFill.fillAmount = 1f;
-        }
+        UpdateHealthUI();
     }
 
     public void TakeDamage(int amount)
     {
-        // invincibility window
         if (Time.time - lastDamageTime < invincibleTime)
             return;
 
@@ -34,16 +30,9 @@ public class PlayerHealth : MonoBehaviour
             return;
 
         currentHealth -= amount;
-
-        // clamp so it never goes below 0
         currentHealth = Mathf.Max(currentHealth, 0);
 
-        // update UI
-        if (healthBarFill != null)
-        {
-            healthBarFill.fillAmount = (float)currentHealth / maxHealth;
-        }
-
+        UpdateHealthUI();
         lastDamageTime = Time.time;
 
         Debug.Log("Player Health: " + currentHealth);
@@ -54,50 +43,48 @@ public class PlayerHealth : MonoBehaviour
         }
     }
 
-    void Die()
-{
-    Debug.Log("Player Died");
-
-    // Stop physics movement immediately
-    Rigidbody2D rb = GetComponent<Rigidbody2D>();
-    if (rb != null)
-    {
-        rb.velocity = Vector2.zero;
-        rb.angularVelocity = 0f;
-    }
-
-    // Disable movement
-    PlayerMove move = GetComponent<PlayerMove>();
-    if (move != null)
-    {
-        move.enabled = false;
-    }
-
-    // Disable shooting
-    PlayerShooter shooter = GetComponent<PlayerShooter>();
-    if (shooter != null)
-    {
-        shooter.enabled = false;
-    }
-
-    // Return to main menu after 3 seconds
-        StartCoroutine(ReturnToMainMenu());
-   
-    System.Collections.IEnumerator ReturnToMainMenu()
-    {
-        yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene("MainMenu");
-    }
-}
-
     public void Heal(int amount)
     {
         currentHealth += amount;
         currentHealth = Mathf.Min(currentHealth, maxHealth);
+        UpdateHealthUI();
+    }
 
-        if (healthBarFill != null)
+    void UpdateHealthUI()
+    {
+        if (healthText != null)
+            healthText.text = currentHealth + "%";
+    }
+
+    void Die()
+    {
+        Debug.Log("Player Died");
+
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
         {
-            healthBarFill.fillAmount = (float)currentHealth / maxHealth;
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
         }
+
+        PlayerMove move = GetComponent<PlayerMove>();
+        if (move != null)
+        {
+            move.enabled = false;
+        }
+
+        PlayerShooter shooter = GetComponent<PlayerShooter>();
+        if (shooter != null)
+        {
+            shooter.enabled = false;
+        }
+
+        StartCoroutine(ReturnToMainMenu());
+    }
+
+    IEnumerator ReturnToMainMenu()
+    {
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene("MainMenu");
     }
 }

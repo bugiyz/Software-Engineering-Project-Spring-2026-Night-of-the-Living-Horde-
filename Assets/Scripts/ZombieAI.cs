@@ -84,10 +84,6 @@ public class ZombieAI : MonoBehaviour
 
         audioSource = GetComponent<AudioSource>();
         
-        Debug.Log("Idle clip assigned? " + (idleClip != null));
-        Debug.Log("AudioSource found? " + (audioSource != null));
-
-
         if (idleClip != null)
         {
             audioSource.clip = idleClip;
