@@ -11,9 +11,18 @@ public class WaveSpawner : MonoBehaviour
     // Reference to the zombie prefab to spawn, and tweaking of zombie starting count 
     // and increases per wave and also reference to UI elements to update wave and zommbie count 
     // in inspector for easy tweaking without code changes
-    [Header("Zombie")]
-    public GameObject zombiePrefab;
+    [Header("Zombie Types")]
+    public GameObject basicZombiePrefab;
+    public GameObject smartZombiePrefab;
 
+    [Range(0f, 1f)]
+    public float startingSmartZombieRatio = 0.5f;
+
+    [Range(0f, 1f)]
+    public float smartZombieRatioIncreasePerWave = 0.05f;
+
+    [Range(0f, 1f)]
+    public float maxSmartZombieRatio = 0.9f;
     [Header("Spawn Points")]
     public Transform[] spawnPoints;
 
@@ -70,23 +79,28 @@ public class WaveSpawner : MonoBehaviour
     }
 
     void SpawnZombie()
+{
+    if (spawnPoints.Length == 0) return;
+
+    Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+
+    float smartRatio = GetSmartZombieRatio();
+
+    GameObject prefabToSpawn = Random.value < smartRatio
+        ? smartZombiePrefab
+        : basicZombiePrefab;
+
+    GameObject zombie = Instantiate(prefabToSpawn, spawnPoint.position, Quaternion.identity);
+
+    ZombieHealth zh = zombie.GetComponent<ZombieHealth>();
+    if (zh != null)
     {
-        // Choose a random spawn point from the array of spawn points to add variety to where 
-        // zombies appear
-        Transform spawn = spawnPoints[Random.Range(0, spawnPoints.Length)];
-        GameObject z = Instantiate(zombiePrefab, spawn.position, Quaternion.identity);
-        // Get the ZombieHealth component from the spawned zombie to subscribe to its death event
-        ZombieHealth zh = z.GetComponent<ZombieHealth>();
-        // If the ZombieHealth component is found, subscribe to the OnZombieDeath event 
-        // to track when this zombie dies
-        if (zh != null)
-        {
-            zh.OnZombieDeath += ZombieDied;
-        }
-        // Increment the count of zombies alive and update the UI to reflect the new count
-        zombiesAlive++;
-        UpdateUI();
+        zh.OnZombieDeath += ZombieDied;
     }
+
+    zombiesAlive++;
+    UpdateUI();
+}
 
     void ZombieDied()
     {
@@ -100,6 +114,12 @@ public class WaveSpawner : MonoBehaviour
         {
             StartCoroutine(WaitForNextWave());
         }
+    }
+
+    float GetSmartZombieRatio()
+    {
+        float ratio = startingSmartZombieRatio + (currentWave - 1) * smartZombieRatioIncreasePerWave;
+        return Mathf.Clamp(ratio, 0f, maxSmartZombieRatio);
     }
 
     IEnumerator WaitForNextWave()
