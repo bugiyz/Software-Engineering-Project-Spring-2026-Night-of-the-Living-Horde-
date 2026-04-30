@@ -5,11 +5,13 @@ public class MainMenuManager : MonoBehaviour
 {
     public GameObject mainMenuPanel;
     public GameObject settingsPanel;
+    public SettingsUI settingsUI;
 
     public void OpenSettings()
     {
         mainMenuPanel.SetActive(false);
         settingsPanel.SetActive(true);
+        settingsUI.SyncUI();
     }
 
     public void ReturnToMain()
