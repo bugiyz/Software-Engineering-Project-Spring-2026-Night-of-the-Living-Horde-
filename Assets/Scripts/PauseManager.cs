@@ -21,6 +21,7 @@ public class PauseManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+
             // If settings is open, ESC closes settings first
             if (isSettingsOpen)
             {
@@ -35,12 +36,16 @@ public class PauseManager : MonoBehaviour
             else
             {
                 PauseGame();
+
             }
         }
     }
 
     public void PauseGame()
     {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        
         pausePanel.SetActive(true);
         settingsPanel.SetActive(false);
 
@@ -51,6 +56,9 @@ public class PauseManager : MonoBehaviour
 
     public void ResumeGame()
     {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Confined;
+
         pausePanel.SetActive(false);
         settingsPanel.SetActive(false);
 

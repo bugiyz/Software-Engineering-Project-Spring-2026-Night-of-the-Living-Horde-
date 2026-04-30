@@ -6,7 +6,7 @@ using System.Collections;
 public class ZombieHealth : MonoBehaviour
 {
     public event Action OnZombieDeath;
-    
+
     [Header("Health")]
     public int maxHealth = 50;
     public int currentHealth;
@@ -19,6 +19,10 @@ public class ZombieHealth : MonoBehaviour
     public AudioClip hurtClip;
     public AudioClip deathClip;
 
+    
+
+    private bool isDead = false;
+
     void Start()
     {
         currentHealth = maxHealth;
@@ -27,19 +31,21 @@ public class ZombieHealth : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
-        if (currentHealth <= 0) return;
+        if (isDead || currentHealth <= 0) return;
 
         currentHealth -= amount;
         currentHealth = Mathf.Max(currentHealth, 0);
 
         UpdateBar();
 
-        // Play Hurt Sound
-        audioSource.PlayOneShot(hurtClip);
+        if (currentHealth > 0)
+        {
+            if (audioSource != null && hurtClip != null)
+                audioSource.PlayOneShot(hurtClip);
+        }
 
         if (currentHealth == 0)
             Die();
-            
     }
 
     void UpdateBar()
@@ -49,45 +55,83 @@ public class ZombieHealth : MonoBehaviour
     }
 
     void Die()
-{
-    if (audioSource != null && deathClip != null)
-        audioSource.PlayOneShot(deathClip);
+    {
+        if (isDead) return;
+        isDead = true;
+
+        if (audioSource != null && deathClip != null)
+            audioSource.PlayOneShot(deathClip);
 
         Animator anim = GetComponentInChildren<Animator>();
         if (anim != null)
-            anim.SetTrigger("Die");
+        {
+            // Old zombies can still use a trigger named "Die"
+            if (HasTriggerParameter(anim, "Die"))
+                anim.SetTrigger("Die");
 
-        ZombieAI ai = GetComponent<ZombieAI>();
-        if (ai != null)
-            ai.enabled = false;
+            // New pathfinding zombie can use a bool named "IsDead"
+            if (HasBoolParameter(anim, "IsDead"))
+                anim.SetBool("IsDead", true);
+        }
+
+        // Stop old zombie AI if present
+        ZombieAI oldAI = GetComponent<ZombieAI>();
+        if (oldAI != null)
+            oldAI.enabled = false;
+
+        // Stop new pathfinding AI if present
+        ZombiePathfindingAI pathAI = GetComponent<ZombiePathfindingAI>();
+        if (pathAI != null)
+        {
+            pathAI.Die(); // Call Die() to handle stopping movement and other logic
+            pathAI.enabled = false;
+        }
 
         StartCoroutine(DeathRoutine());
-}
-
-    IEnumerator DeathRoutine()
-{
-    Collider2D col = GetComponent<Collider2D>();
-    Rigidbody2D rb = GetComponent<Rigidbody2D>();
-
-    if (col != null)
-        col.enabled = false;
-
-    if (rb != null)
-    {
-        rb.velocity = Vector2.zero;
-        rb.simulated = false;
     }
 
-    // wait for death animation to finish
-    float waitTime = 0.5f;
+    IEnumerator DeathRoutine()
+    {
+        Collider2D col = GetComponent<Collider2D>();
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
 
-    // Keep sprite visible while death sound plays
-    if (deathClip != null)
-        waitTime = Mathf.Max(waitTime, deathClip.length);
+        if (col != null)
+            col.enabled = false;
 
-    yield return new WaitForSeconds(waitTime);
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.simulated = false;
+        }
 
-    OnZombieDeath?.Invoke();
-    Destroy(gameObject);
-}
+        float waitTime = 0.5f;
+
+        if (deathClip != null)
+            waitTime = Mathf.Max(waitTime, deathClip.length);
+
+        yield return new WaitForSeconds(waitTime);
+
+        OnZombieDeath?.Invoke();
+        Destroy(gameObject);
+    }
+
+    bool HasTriggerParameter(Animator animator, string paramName)
+    {
+        foreach (var param in animator.parameters)
+        {
+            if (param.name == paramName && param.type == AnimatorControllerParameterType.Trigger)
+                return true;
+        }
+        return false;
+    }
+
+    bool HasBoolParameter(Animator animator, string paramName)
+    {
+        foreach (var param in animator.parameters)
+        {
+            if (param.name == paramName && param.type == AnimatorControllerParameterType.Bool)
+                return true;
+        }
+        return false;
+    }
 }

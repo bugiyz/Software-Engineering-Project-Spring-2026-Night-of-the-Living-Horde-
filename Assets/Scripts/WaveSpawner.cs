@@ -2,11 +2,27 @@ using System.Collections;
 using UnityEngine;
 using TMPro;
 
+// This script is responsible for spawning waves of zombies at specified spawn points,
+// managing the wave progression, and updating the UI to display the current wave and number of zombies
+// The wave spawner increases the number of zombies each wave and heals the player to full health at 
+// the start of each wave
 public class WaveSpawner : MonoBehaviour
 {
-    [Header("Zombie")]
-    public GameObject zombiePrefab;
+    // Reference to the zombie prefab to spawn, and tweaking of zombie starting count 
+    // and increases per wave and also reference to UI elements to update wave and zommbie count 
+    // in inspector for easy tweaking without code changes
+    [Header("Zombie Types")]
+    public GameObject basicZombiePrefab;
+    public GameObject smartZombiePrefab;
 
+    [Range(0f, 1f)]
+    public float startingSmartZombieRatio = 0.5f;
+
+    [Range(0f, 1f)]
+    public float smartZombieRatioIncreasePerWave = 0.05f;
+
+    [Range(0f, 1f)]
+    public float maxSmartZombieRatio = 0.9f;
     [Header("Spawn Points")]
     public Transform[] spawnPoints;
 
@@ -19,7 +35,8 @@ public class WaveSpawner : MonoBehaviour
     [Header("UI")]
     public TextMeshProUGUI waveText;
     public TextMeshProUGUI zombiesCountText;
-
+    // Internal tracking of the current wave number, number of zombies alive, 
+    // and number of zombies to spawn in the current wave
     int currentWave = 0;
     int zombiesAlive = 0;
     int zombiesToSpawn = 0;
@@ -27,70 +44,99 @@ public class WaveSpawner : MonoBehaviour
 
     void Start()
     {
+        // Start the first wave when the game begins
         StartCoroutine(StartNextWave());
     }
 
     IEnumerator StartNextWave()
     {
+        // Set the spawningWave flag to true to indicate that a wave is currently being spawned
         spawningWave = true;
-
+        // Increment the current wave number to track progression
         currentWave++;
-
+        // Heal the player to full health at the start of each wave by finding 
+        // the PlayerHealth component
+        PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
+        if (playerHealth != null){
+            playerHealth.Heal(100); // Heal player to full health at the start of each wave
+        }
+        // Calculate the number of zombies to spawn for this wave based on the starting
+        // number and the increase per wave, allowing for scaling difficulty as waves progress
         zombiesToSpawn = startingZombies + (currentWave - 1) * zombiesIncreasePerWave;
-
+        // For debugging purposes only
         Debug.Log("Starting Wave " + currentWave);
-
+        // Update the UI to reflect the new wave and update the new zombies being spawned in
         UpdateUI();
-
+        // Spawn the zombies for this wave with a delay between each spawn to create a more dynamic 
+        // and less overwhelming experience for the player can be adjusted to vary in difficulty
         for (int i = 0; i < zombiesToSpawn; i++)
         {
             SpawnZombie();
             yield return new WaitForSeconds(timeBetweenSpawns);
         }
-
+        // Set the spawningWave flag to false to indicate that all zombies for this wave have been spawned
         spawningWave = false;
     }
 
     void SpawnZombie()
+{
+    if (spawnPoints.Length == 0) return;
+
+    Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+
+    float smartRatio = GetSmartZombieRatio();
+
+    GameObject prefabToSpawn = Random.value < smartRatio
+        ? smartZombiePrefab
+        : basicZombiePrefab;
+
+    GameObject zombie = Instantiate(prefabToSpawn, spawnPoint.position, Quaternion.identity);
+
+    ZombieHealth zh = zombie.GetComponent<ZombieHealth>();
+    if (zh != null)
     {
-        Transform spawn = spawnPoints[Random.Range(0, spawnPoints.Length)];
-
-        GameObject z = Instantiate(zombiePrefab, spawn.position, Quaternion.identity);
-
-        ZombieHealth zh = z.GetComponent<ZombieHealth>();
-
-        if (zh != null)
-        {
-            zh.OnZombieDeath += ZombieDied;
-        }
-
-        zombiesAlive++;
-        UpdateUI();
+        zh.OnZombieDeath += ZombieDied;
     }
+
+    zombiesAlive++;
+    UpdateUI();
+}
 
     void ZombieDied()
     {
+        // Decrement the count of zombies alive when a zombie dies and update the UI
         zombiesAlive--;
 
         UpdateUI();
-
+        // If all zombies have been killed and we are not currently spawning a new wave, 
+        // start the next wave after a delay
         if (zombiesAlive <= 0 && !spawningWave)
         {
             StartCoroutine(WaitForNextWave());
         }
     }
 
+    float GetSmartZombieRatio()
+    {
+        float ratio = startingSmartZombieRatio + (currentWave - 1) * smartZombieRatioIncreasePerWave;
+        return Mathf.Clamp(ratio, 0f, maxSmartZombieRatio);
+    }
+
     IEnumerator WaitForNextWave()
     {
+        // For debugging purposes only
         Debug.Log("Wave Cleared!");
-
+        // Wait for the specified time between waves to give the player a brief respite 
+        // before the next wave starts
         yield return new WaitForSeconds(timeBetweenWaves);
-
+        // Start the next wave by calling the StartNextWave coroutine
         StartCoroutine(StartNextWave());
     }
 
     void UpdateUI()
     {
+        // Update the wave and zombies count in the UI elements to reflect the cuurent
+        // state of the game
         if (waveText != null)
             waveText.text = "Wave: " + currentWave;
 

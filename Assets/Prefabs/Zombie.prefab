@@ -154,8 +154,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c365804571c333e4cb9f48f8a03a8a9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRadius: 15
-  loseRadius: 8
+  detectionRadius: 60
+  loseRadius: 60
   requireLineOfSight: 1
   playerLayer:
     serializedVersion: 2
