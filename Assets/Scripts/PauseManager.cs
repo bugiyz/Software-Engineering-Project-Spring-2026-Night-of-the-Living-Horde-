@@ -1,13 +1,16 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class PauseManager : MonoBehaviour
 {
     public GameObject pausePanel;
     public GameObject settingsPanel;
+    public SettingsUI settingsUI;
 
     private bool isPaused = false;
     private bool isSettingsOpen = false;
+
 
     void Start()
     {
@@ -15,12 +18,18 @@ public class PauseManager : MonoBehaviour
         settingsPanel.SetActive(false);
 
         Time.timeScale = 1f;
+        var systems = FindObjectsOfType<UnityEngine.EventSystems.EventSystem>();
+        Debug.Log("EventSystems count: " + systems.Length);
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+
+            {
+            Debug.Log("ESC detected");
+            }
             // If settings is open, ESC closes settings first
             if (isSettingsOpen)
             {
@@ -35,12 +44,16 @@ public class PauseManager : MonoBehaviour
             else
             {
                 PauseGame();
+
             }
         }
     }
 
     public void PauseGame()
     {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        
         pausePanel.SetActive(true);
         settingsPanel.SetActive(false);
 
@@ -51,6 +64,9 @@ public class PauseManager : MonoBehaviour
 
     public void ResumeGame()
     {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Confined;
+
         pausePanel.SetActive(false);
         settingsPanel.SetActive(false);
 
@@ -63,6 +79,8 @@ public class PauseManager : MonoBehaviour
     {
         settingsPanel.SetActive(true);
         isSettingsOpen = true;
+        SettingsUI ui = settingsPanel.GetComponent<SettingsUI>();
+        ui.SyncUI();
     }
 
     public void CloseSettings()
