@@ -62,6 +62,10 @@ public class ZombieAI : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip idleClip;
     public AudioClip attackClip;
+
+    [Header("Visual Rotation")]
+    [SerializeField] private Transform visual;
+    [SerializeField] private float rotationOffset = 0f;
     
     //attack cooldown timer and last move direction for attack point positioning
     float nextAttackTime;
@@ -114,18 +118,22 @@ public class ZombieAI : MonoBehaviour
         {
             float dist = Vector2.Distance(rb.position, (Vector2)player.position);
             // If within attack range, stop moving and try to attack. Also update the animator to face the player.
+            
+            Debug.Log("Distance to player: " + dist);
             if (dist <= attackRange)
             {
-                TryAttack();
+
+                Debug.Log("In Attack Range");
+
                 rb.velocity = Vector2.zero;
-                UpdateAnimatorFacing(lastMoveDir);
+
+                Vector2 dirToPlayer = ((Vector2)player.position - rb.position).normalized;
+                lastMoveDir = dirToPlayer;
+
+                UpdateAnimatorFacing(dirToPlayer);
+                TryAttack();
+
                 return;
-            }
-            else
-            {
-                // If we have a target but are not in attack range, ensure we're not 
-                // in the attacking animation state.
-                if (anim) anim.SetBool(isAttackingParam, false);
             }
         }
         // If we're chasing a target, calculate the desired direction towards the player, 
@@ -297,35 +305,41 @@ public class ZombieAI : MonoBehaviour
         if (!anim) return;
         // Calculate the speed and direction of movement to update the animator parameters
         float speed = velocity.magnitude;
+        anim.SetFloat("Speed", speed);
         // Check if speed is low enough to consider the zombie idle, if so return early
         // This prevents zombie from snapping back to default facing direction
         if (speed < 0.01f)
             return;
         // Calculate the direction of movement
-        Vector2 dir = velocity / speed;
-        // Update the animator parameters for movement direction with damping to smooth out transitions
-        anim.SetFloat(moveXParam, dir.x, animDampTime, Time.fixedDeltaTime);
-        anim.SetFloat(moveYParam, dir.y, animDampTime, Time.fixedDeltaTime);
+        Vector2 dir = velocity.normalized;
+
+        lastMoveDir = dir;
+
+        if (visual != null)
+        {
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            visual.rotation = Quaternion.Euler(0, 0, angle + rotationOffset);
+        }
     }
 
     void TryAttack()
     {
-        // If no animator assigned return early to avoid null reference errors
         if (!anim) return;
-        // Set the attacking parameter to true to trigger the attack animation
-        anim.SetBool(isAttackingParam, true);
-        // Check if enough time has passed since the last attack based on the attack cooldown
+
         if (Time.time < nextAttackTime)
             return;
-        // If we are ready to attack, set the next attack time
-        // and call method to deal damage to player if they are hit by the attack
+
         nextAttackTime = Time.time + attackCooldown;
+
+        anim.SetTrigger("Attack");
+
         DealDamage();
 
-        // Play Attack Sound
-        audioSource.PlayOneShot(attackClip);
-    }
-
+        if (audioSource != null && attackClip != null)
+        {
+            audioSource.PlayOneShot(attackClip);
+        }
+}
     void DealDamage()
     {
         // If no attack point is assigned, return early to avoid null reference errors
@@ -348,15 +362,17 @@ public class ZombieAI : MonoBehaviour
     }
 
     void UpdateAnimatorFacing(Vector2 dir)
-    {
-        // If no animator assigned return early to avoid null reference errors
-        if (!anim) return;
+    { 
         // Check if the direction vector is significant enough to update the animator parameters
         if (dir.sqrMagnitude < 0.0001f) return;
-        // Update the animator parameters for movement direction with damping to smoothly 
-        // transition the facing direction
-        anim.SetFloat(moveXParam, dir.x, animDampTime, Time.fixedDeltaTime);
-        anim.SetFloat(moveYParam, dir.y, animDampTime, Time.fixedDeltaTime);
+
+        lastMoveDir = dir.normalized;
+
+        if (visual != null)
+        {
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            visual.rotation = Quaternion.Euler(0, 0, angle + rotationOffset);
+        }
     }
     // This method is used for debugging purposes to visualize various radius's
     // such as detection radius, lose radius, and attack git radius
