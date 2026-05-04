@@ -3,7 +3,19 @@
   "WorkspaceRootPath": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|c:\\users\\oswad\\onedrive\\documents\\github\\new folder\\software-engineering-project-spring-2026\\assets\\scripts\\playermove.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|c:\\users\\oswad\\onedrive\\documents\\github\\new folder\\software-engineering-project-spring-2026\\assets\\scripts\\healthpickup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\healthpickup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\TextMesh Pro\\Sprites\\HealthPickup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\TextMesh Pro\\Sprites\\HealthPickup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\assets\\scripts\\zombiehealth.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\zombiehealth.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\assets\\scripts\\playermove.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8D948169-0CC2-50EF-C20E-5CF59E00EB4F}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\playermove.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
@@ -22,11 +34,47 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HealthPickup.cs",
+              "DocumentMoniker": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\HealthPickup.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\HealthPickup.cs",
+              "ToolTip": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\HealthPickup.cs",
+              "RelativeToolTip": "Assets\\Scripts\\HealthPickup.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAswDkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-01T05:40:10.913Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "HealthPickup.cs",
+              "DocumentMoniker": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\TextMesh Pro\\Sprites\\HealthPickup.cs",
+              "RelativeDocumentMoniker": "Assets\\TextMesh Pro\\Sprites\\HealthPickup.cs",
+              "ToolTip": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\TextMesh Pro\\Sprites\\HealthPickup.cs",
+              "RelativeToolTip": "Assets\\TextMesh Pro\\Sprites\\HealthPickup.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-01T05:12:22.996Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ZombieHealth.cs",
+              "DocumentMoniker": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\ZombieHealth.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\ZombieHealth.cs",
+              "ToolTip": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\ZombieHealth.cs",
+              "RelativeToolTip": "Assets\\Scripts\\ZombieHealth.cs",
+              "ViewState": "AgIAAFkAAAAAAAAAAAAIwJIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-01T04:51:14.844Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "CameraFollow2D.cs",
               "DocumentMoniker": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\CameraFollow2D.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\CameraFollow2D.cs",
@@ -38,7 +86,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "Bullet.cs",
               "DocumentMoniker": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\Bullet.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\Bullet.cs",
@@ -50,7 +98,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "PlayerMove.cs",
               "DocumentMoniker": "C:\\Users\\oswad\\OneDrive\\Documents\\GitHub\\New folder\\Software-Engineering-Project-Spring-2026\\Assets\\Scripts\\PlayerMove.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerMove.cs",
@@ -58,8 +106,7 @@
               "RelativeToolTip": "Assets\\Scripts\\PlayerMove.cs",
               "ViewState": "AgIAAGEAAAAAAAAAAAAkwKAAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-12T03:55:24.177Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-12T03:55:24.177Z"
             }
           ]
         }

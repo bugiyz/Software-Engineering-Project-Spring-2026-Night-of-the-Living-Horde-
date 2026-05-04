@@ -267,6 +267,8 @@ MonoBehaviour:
   audioSource: {fileID: -6355182985382014603}
   hurtClip: {fileID: 8300000, guid: fb7fbee5d5ed64bd1a8ca1ad242ba7eb, type: 3}
   deathClip: {fileID: 8300000, guid: 9dcd13733ae1542fba4664e841eb4fff, type: 3}
+  healthPickupPrefab: {fileID: 6135891541370973416, guid: c1a0fe3422f61c14082c9ebdc91370ac, type: 3}
+  healthDropChance: 0.6
 --- !u!82 &-6355182985382014603
 AudioSource:
   m_ObjectHideFlags: 0

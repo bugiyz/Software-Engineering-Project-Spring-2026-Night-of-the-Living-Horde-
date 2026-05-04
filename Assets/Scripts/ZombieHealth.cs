@@ -19,7 +19,9 @@ public class ZombieHealth : MonoBehaviour
     public AudioClip hurtClip;
     public AudioClip deathClip;
 
-    
+    [Header("Drops")]
+    [SerializeField] GameObject healthPickupPrefab;
+    [SerializeField] float healthDropChance = 0.6f; // 60% chance
 
     private bool isDead = false;
 
@@ -65,25 +67,21 @@ public class ZombieHealth : MonoBehaviour
         Animator anim = GetComponentInChildren<Animator>();
         if (anim != null)
         {
-            // Old zombies can still use a trigger named "Die"
             if (HasTriggerParameter(anim, "Die"))
                 anim.SetTrigger("Die");
 
-            // New pathfinding zombie can use a bool named "IsDead"
             if (HasBoolParameter(anim, "IsDead"))
                 anim.SetBool("IsDead", true);
         }
 
-        // Stop old zombie AI if present
         ZombieAI oldAI = GetComponent<ZombieAI>();
         if (oldAI != null)
             oldAI.enabled = false;
 
-        // Stop new pathfinding AI if present
         ZombiePathfindingAI pathAI = GetComponent<ZombiePathfindingAI>();
         if (pathAI != null)
         {
-            pathAI.Die(); // Call Die() to handle stopping movement and other logic
+            pathAI.Die();
             pathAI.enabled = false;
         }
 
@@ -110,6 +108,18 @@ public class ZombieHealth : MonoBehaviour
             waitTime = Mathf.Max(waitTime, deathClip.length);
 
         yield return new WaitForSeconds(waitTime);
+
+        // ? 60% chance to drop health
+        if (UnityEngine.Random.value < healthDropChance && healthPickupPrefab != null)
+        {
+            Vector3 offset = new Vector3(
+                UnityEngine.Random.Range(-0.5f, 0.5f),
+                UnityEngine.Random.Range(-0.5f, 0.5f),
+                0f
+            );
+
+            Instantiate(healthPickupPrefab, transform.position + offset, Quaternion.identity);
+        }
 
         OnZombieDeath?.Invoke();
         Destroy(gameObject);
