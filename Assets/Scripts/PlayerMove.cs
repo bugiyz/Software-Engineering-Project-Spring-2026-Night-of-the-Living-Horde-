@@ -9,6 +9,10 @@ using UnityEngine.UI;
 
 public class PlayerMove : MonoBehaviour
 {
+
+    [Header("Aim Pointer")]
+    public Transform aimPointer;
+    public float aimPointerRadius = 1.5f;
     // Movement speeds for walking and running, set in the inspector for easy tweaking
     public float speed = 5f;
     public float runSpeed = 8f;
@@ -82,8 +86,17 @@ public class PlayerMove : MonoBehaviour
     Cursor.lockState = CursorLockMode.Confined;
 }
 
+void Start()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Confined;
+    }
+
     void Update()
     {
+
+        if (Time.timeScale == 0f)
+            return;
         // If the player is currently exhausted, decrement the exhausted timer and 
         // return early to prevent
         // Read movement input using the Input.GetAxisRaw method for eaier input handling than 
@@ -197,6 +210,13 @@ public class PlayerMove : MonoBehaviour
         isDashing = false;
     }
 
+    public void RestoreStaminaFull()
+    {
+        stamina = maxStamina;
+        exhausted = false;
+        exhaustedTimer = 0f;
+        UpdateStaminaUI();
+    }
     void UpdateStaminaUI()
     {
         // If the stamina bar UI image is assigned, update its fill amount based on the current stamina 
@@ -206,18 +226,27 @@ public class PlayerMove : MonoBehaviour
        
     }
     void RotateToMouse()
+{
+    if (visual == null) return;
+
+    Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    mousePos.z = 0f;
+
+    Vector2 direction = mousePos - transform.position;
+
+    if (direction.sqrMagnitude < 0.01f)
+        return;
+
+    direction.Normalize();
+
+    float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+    visual.rotation = Quaternion.Euler(0f, 0f, angle + 90f);
+
+    if (aimPointer != null)
     {
-        // If no visual transform is assigned, return early since we have no reference for aiming 
-        // direction
-        if (visual == null) return;
-        // Get the mouse position in world coordinates and calculate the direction from the visual
-        // transform to the mouse position to determine the angle to rotate the visual for aiming
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 direction = mousePos - visual.position;
-
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
-        // Because sprite faces DOWN by default
-        visual.rotation = Quaternion.Euler(0f, 0f, angle + 90f);
+        aimPointer.position = transform.position + (Vector3)(direction * aimPointerRadius);
+        aimPointer.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
     }
+}
 }

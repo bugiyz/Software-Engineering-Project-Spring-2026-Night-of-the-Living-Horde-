@@ -321,20 +321,21 @@ public class ZombieAI : MonoBehaviour
             visual.rotation = Quaternion.Euler(0, 0, angle + rotationOffset);
         }
     }
-
+    // function to try and attack the player
     void TryAttack()
     {
+        // If no animator is assigned, return early to avoid null reference errors
         if (!anim) return;
-
+        // If the current time is before the next attack time, return early
         if (Time.time < nextAttackTime)
             return;
-
+        // Set the next attack time to the current time plus the attack cooldown
         nextAttackTime = Time.time + attackCooldown;
-
+        // Trigger the attack animation
         anim.SetTrigger("Attack");
-
+        // Play the attack sound
         DealDamage();
-
+        // If no audio source is assigned, return early to avoid null reference errors
         if (audioSource != null && attackClip != null)
         {
             audioSource.PlayOneShot(attackClip);

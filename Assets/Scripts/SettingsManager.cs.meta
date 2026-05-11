@@ -4,9 +4,10 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
+  - mixer: {instanceID: 0}
   - musicSource: {instanceID: 0}
-  - sfxSource: {instanceID: 0}
-  - mainMenuMusic: {fileID: 8300000, guid: a9a76cf79341542ec95e6085c70fe424, type: 3}
+  - normalMusic: {instanceID: 0}
+  - hardMusic: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

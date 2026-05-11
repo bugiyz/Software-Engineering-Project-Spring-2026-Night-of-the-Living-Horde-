@@ -31,32 +31,26 @@ public class PlayerShooter : MonoBehaviour
             Shoot();
         }
     }
-
+    // function to shoot a bullet
     void Shoot()
     {
-        // Get the mouse position in world coordinates to determine the direction to shoot
         Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorld.z = 0f;
-        // Use the visual transform for aiming
-        Transform aimOrigin = visual != null ? visual : transform;
-        // Calculate the direction from the aim origin to the mouse position for shooting
-        Vector2 dir = (mouseWorld - aimOrigin.position);
 
-        // Prevent weird flipping when mouse is too close to player
+        Vector2 dir = mouseWorld - transform.position;
+        // If the mouse is too close to the player, use the fire point as the direction
         if (dir.magnitude < minAimDistance)
         {
-            dir = firePoint.up; // use current forward direction instead
+            // Use the fire point as the direction
+            dir = firePoint.position - transform.position;
         }
-        // Normalize the direction vector to ensure consistent bullet speed regardless of distance 
-        // to mouse
-        else
-        {
-            dir.Normalize();
-        }
-        // Instantiate a bullet at the fire point position and call its Fire method to set its velocity
+        // Normalize the direction vector
+        dir.Normalize();
+        // Fire the bullet in the calculated direction
         Bullet b = Instantiate(bulletPrefab, firePoint.position, Quaternion.identity);
+        // Set the bullet's direction
         b.Fire(dir);
-        // Play the shooting sound effect
+        // Play the shooting sound
         if (shootSound != null && shootClip != null)
         {
             shootSound.PlayOneShot(shootClip);

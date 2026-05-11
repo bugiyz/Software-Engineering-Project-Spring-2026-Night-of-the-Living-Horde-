@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using Pathfinding;
 
 // This script is responsible for spawning waves of zombies at specified spawn points,
 // managing the wave progression, and updating the UI to display the current wave and number of zombies
@@ -54,6 +55,10 @@ public class WaveSpawner : MonoBehaviour
         spawningWave = true;
         // Increment the current wave number to track progression
         currentWave++;
+        if (GameStats.Instance != null)
+        {
+            GameStats.Instance.SetWave(currentWave);
+        }
         // Heal the player to full health at the start of each wave by finding 
         // the PlayerHealth component
         PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
@@ -77,7 +82,7 @@ public class WaveSpawner : MonoBehaviour
         // Set the spawningWave flag to false to indicate that all zombies for this wave have been spawned
         spawningWave = false;
     }
-
+    // function to spawn a single zombie
     void SpawnZombie()
 {
     if (spawnPoints.Length == 0) return;
@@ -91,6 +96,7 @@ public class WaveSpawner : MonoBehaviour
         : basicZombiePrefab;
 
     GameObject zombie = Instantiate(prefabToSpawn, spawnPoint.position, Quaternion.identity);
+    ApplyDifficultyToZombie(zombie);
 
     ZombieHealth zh = zombie.GetComponent<ZombieHealth>();
     if (zh != null)
@@ -101,7 +107,7 @@ public class WaveSpawner : MonoBehaviour
     zombiesAlive++;
     UpdateUI();
 }
-
+    // function called when a zombie dies
     void ZombieDied()
     {
         // Decrement the count of zombies alive when a zombie dies and update the UI
@@ -116,23 +122,103 @@ public class WaveSpawner : MonoBehaviour
         }
     }
 
-    float GetSmartZombieRatio()
-    {
-        float ratio = startingSmartZombieRatio + (currentWave - 1) * smartZombieRatioIncreasePerWave;
-        return Mathf.Clamp(ratio, 0f, maxSmartZombieRatio);
-    }
-
+    // function to wait for the next wave
     IEnumerator WaitForNextWave()
+{
+    Debug.Log("Wave Cleared!");
+
+    yield return new WaitForSeconds(timeBetweenWaves);
+
+    StartCoroutine(StartNextWave());
+}
+
+    // function to get the ratio of smart zombies
+    float GetSmartZombieRatio()
+{
+    var difficulty = SettingsManager.Instance != null
+        ? SettingsManager.Instance.difficulty
+        : SettingsManager.Difficulty.Easy;
+    // Determine the ratio of smart zombies based on the current difficulty level
+    switch (difficulty)
     {
-        // For debugging purposes only
-        Debug.Log("Wave Cleared!");
-        // Wait for the specified time between waves to give the player a brief respite 
-        // before the next wave starts
-        yield return new WaitForSeconds(timeBetweenWaves);
-        // Start the next wave by calling the StartNextWave coroutine
-        StartCoroutine(StartNextWave());
+        // Easy difficulty: 20% smart zombies
+        case SettingsManager.Difficulty.Easy:
+            return 0.20f;
+        // Medium difficulty: start with 50% smart zombies and increase by 5% each wave
+        case SettingsManager.Difficulty.Normal:
+            return Mathf.Clamp(
+                0.50f + (currentWave - 1) * 0.05f,
+                0.50f,
+                0.80f
+            );
+        // Hard difficulty: start with 70% smart zombies and increase by 5% each wave
+        case SettingsManager.Difficulty.Hard:
+            return Mathf.Clamp(
+                0.70f + (currentWave - 1) * 0.05f,
+                0.70f,
+                0.95f
+            );
+
+        default:
+            return 0.20f;
+    }
+}
+    // function to apply difficulty settings to a zombie
+    void ApplyDifficultyToZombie(GameObject zombie)
+{
+    // Apply difficulty settings to the zombie
+    var difficulty = SettingsManager.Instance != null
+        ? SettingsManager.Instance.difficulty
+        : SettingsManager.Difficulty.Easy;
+    // Determine the difficulty settings based on the current difficulty level
+    int damage = 5;
+    // Set speed multiplier based on the difficulty level
+    float speedMultiplier = 0.85f;
+    // Apply the speed multiplier to the zombie
+    switch (difficulty)
+    {
+        // Easy difficulty: 5 damage, 0.85 speed
+        case SettingsManager.Difficulty.Easy:
+            damage = 5;
+            speedMultiplier = 0.85f;
+            break;
+        // Medium difficulty: 10 damage, 1.15 speed
+        case SettingsManager.Difficulty.Normal:
+            damage = 10;
+            speedMultiplier = 1.15f;
+            break;
+        // Hard difficulty: 15 damage, 1.25 speed
+        case SettingsManager.Difficulty.Hard:
+            damage = 20;
+            speedMultiplier = 1.25f;
+            break;
     }
 
+    // Apply the difficulty settings to the zombie's AI components
+    ZombieAI basicAI = zombie.GetComponent<ZombieAI>();
+    // If the zombie has a basic AI component, apply the difficulty settings to it
+    if (basicAI != null)
+    {
+        basicAI.attackDamage = damage;
+        basicAI.chaseSpeed *= speedMultiplier;
+        basicAI.roamSpeed *= speedMultiplier;
+    }
+    // If the zombie has a pathfinding AI component, apply the difficulty settings to it
+    ZombiePathfindingAI smartAI = zombie.GetComponent<ZombiePathfindingAI>();
+
+    if (smartAI != null)
+    {
+        smartAI.attackDamage = damage;
+
+        AIPath path = zombie.GetComponent<AIPath>();
+
+        if (path != null)
+        {
+            path.maxSpeed *= speedMultiplier;
+        }
+    }
+}
+    // function to update the UI
     void UpdateUI()
     {
         // Update the wave and zombies count in the UI elements to reflect the cuurent

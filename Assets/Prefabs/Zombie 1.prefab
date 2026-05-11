@@ -387,7 +387,7 @@ MonoBehaviour:
   attackWindup: 0.1
   isAttackingParam: IsAttacking
   attackPoint: {fileID: 3954121813741733717}
-  hitRadius: 0.8
+  hitRadius: 0.7
   playerHitLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -478,6 +478,10 @@ MonoBehaviour:
   audioSource: {fileID: 6105882956408510566}
   hurtClip: {fileID: 8300000, guid: fb7fbee5d5ed64bd1a8ca1ad242ba7eb, type: 3}
   deathClip: {fileID: 8300000, guid: 9dcd13733ae1542fba4664e841eb4fff, type: 3}
+  healthPickupPrefab: {fileID: 6135891541370973416, guid: c1a0fe3422f61c14082c9ebdc91370ac, type: 3}
+  healthDropChance: 0.6
+  energyDrinkPrefab: {fileID: 7429839434327777014, guid: c363654808af0974786218c500e999a6, type: 3}
+  energyDropChance: 0.25
 --- !u!82 &6105882956408510566
 AudioSource:
   m_ObjectHideFlags: 0
@@ -487,7 +491,7 @@ AudioSource:
   m_GameObject: {fileID: 6754278510830882287}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 3061656765749523788, guid: 952badd1779700645ae91e9270967aeb, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 0.6

@@ -15,7 +15,7 @@ public class CameraFollow2D : MonoBehaviour
     // A velocity variable used by the SmoothDamp function
     private Vector3 velocity = Vector3.zero;
 
-    // NEW: Camera boundary limits (prevents showing outside map)
+    // Camera boundary limits (prevents showing outside map)
     [Header("Camera Bounds")]
     public float minX;
     public float maxX;
@@ -33,7 +33,7 @@ public class CameraFollow2D : MonoBehaviour
         // Smoothly move camera toward target
         Vector3 smoothPos = Vector3.SmoothDamp(transform.position, targetPos, ref velocity, smoothTime);
 
-        // NEW: Clamp camera position so it does not go outside map bounds
+        // Clamp camera position so it does not go outside map bounds
         float clampedX = Mathf.Clamp(smoothPos.x, minX, maxX);
         float clampedY = Mathf.Clamp(smoothPos.y, minY, maxY);
 

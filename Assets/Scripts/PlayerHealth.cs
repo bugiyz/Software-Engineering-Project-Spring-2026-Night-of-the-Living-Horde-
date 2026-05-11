@@ -79,59 +79,73 @@ public class PlayerHealth : MonoBehaviour
     }
 
     void Die()
+    {
+        // If the player is already marked as dead, return early to prevent running death behavior 
+        // multiple times
+        if (isDead) return;
+
+        isDead = true;
+
+        // For debugging purposes only, log a message to the console when the player 
+        // dies to confirm that the death behavior is being triggered correctly
+        Debug.Log("Player Died");
+
+        // If an Animator component is assigned, set the "isDead" boolean parameter to true to trigger the 
+        // death animation
+        if (animator != null)
+        {
+            animator.SetBool("isDead", true);
+        }
+
+        // Disable player controls by setting the Rigidbody2D to kinematic and disabling the collider and
+        // movement/shooting scripts to prevent any further input or movement after death
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.bodyType = RigidbodyType2D.Kinematic;
+        }
+
+        // Disable the player's collider to prevent further collisions with zombies or other objects after 
+        // death
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null)
+        {
+            col.enabled = false;
+        }
+
+        // Disable the PlayerMove script to prevent any further movement input after death
+        PlayerMove move = GetComponent<PlayerMove>();
+        if (move != null)
+        {
+            move.enabled = false;
+        }
+
+        // Disable the PlayerShooter script to prevent any further shooting input after death
+        PlayerShooter shooter = GetComponent<PlayerShooter>();
+        if (shooter != null)
+        {
+            shooter.enabled = false;
+        }
+
+        if (GameStats.Instance != null)
+        {
+            GameStats.Instance.SaveHighScores();
+        }
+
+        // Start the coroutine to go to Game Over after a delay,
+        // allowing time for the death animation to play
+        StartCoroutine(GoToGameOverAfterDelay());
+}
+
+IEnumerator GoToGameOverAfterDelay()
 {
-    // If the player is already marked as dead, return early to prevent running death behavior 
-    // multiple times
-    if (isDead) return;
-    isDead = true;
-    // For debugging purposes only, log a message to the console when the player 
-    // dies to confirm that the death behavior is being triggered correctly
-    Debug.Log("Player Died");
-    // If an Animator component is assigned, set the "isDead" boolean parameter to true to trigger the 
-    // death animation
-    if (animator != null)
-    {
-        animator.SetBool("isDead", true);
-    }
-    // Disable player controls by setting the Rigidbody2D to kinematic and disabling the collider and
-    // movement/shooting scripts to prevent any further input or movement after death
-    Rigidbody2D rb = GetComponent<Rigidbody2D>();
-    if (rb != null)
-    {
-        rb.velocity = Vector2.zero;
-        rb.angularVelocity = 0f;
-        rb.bodyType = RigidbodyType2D.Kinematic;
-    }
-    // Disable the player's collider to prevent further collisions with zombies or other objects after 
-    // death
-    Collider2D col = GetComponent<Collider2D>();
-    if (col != null)
-    {
-        col.enabled = false;
-    }
-    // Disable the PlayerMove and PlayerShooter scripts to prevent any further movement or shooting 
-    // input after death
-    PlayerMove move = GetComponent<PlayerMove>();
-    if (move != null)
-    {
-        move.enabled = false;
-    }
-    // Disable the PlayerShooter script to prevent any further shooting input after death
-    PlayerShooter shooter = GetComponent<PlayerShooter>();
-    if (shooter != null)
-    {
-        shooter.enabled = false;
-    }
-    // Start the coroutine to return to the main menu after a delay, allowing time for the death 
-    // animation to play before transitioning back to the main menu scene
-    StartCoroutine(ReturnToMainMenu());
+    yield return new WaitForSeconds(2f);
+
     Cursor.visible = true;
     Cursor.lockState = CursorLockMode.None;
+
+    SceneManager.LoadScene("GameOver");
 }
-    // Coroutine to handle returning to the main menu after a delay when the player dies
-    IEnumerator ReturnToMainMenu()
-    {
-        yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene("MainMenu");
-    }
 }
